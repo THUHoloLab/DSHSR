@@ -22,7 +22,7 @@ import math
 from cv2 import imwrite
 import os
 
-def random_crop(frames, crop_sz):
+def random_crop(frames, crop_sz, center_crop=False):
     """ Extract a random crop of size crop_sz from the input frames. If the crop_sz is larger than the input image size,
     then the largest possible crop of same aspect ratio as crop_sz will be extracted from frames, and upsampled to
     crop_sz.
@@ -47,8 +47,14 @@ def random_crop(frames, crop_sz):
 
     assert orig_crop_sz[-2] <= shape[-2] and orig_crop_sz[-1] <= shape[-1], 'Bug in crop size estimation!'
 
-    r1 = random.randint(0, shape[-2] - orig_crop_sz[-2])
-    c1 = random.randint(0, shape[-1] - orig_crop_sz[-1])
+    if center_crop:
+        r1 = (shape[-2] - orig_crop_sz[-2]) // 2
+        r1 = int(r1)
+        c1 = (shape[-1] - orig_crop_sz[-1]) // 2
+        c1 = int(c1)
+    else:
+        r1 = random.randint(0, shape[-2] - orig_crop_sz[-2])
+        c1 = random.randint(0, shape[-1] - orig_crop_sz[-1])
 
     r2 = r1 + orig_crop_sz[0].int().item()
     c2 = c1 + orig_crop_sz[1].int().item()
