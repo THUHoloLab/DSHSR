@@ -10,4 +10,7 @@ python test_synthetic.py --model_path model_path --test_size 448 --test_file tes
 ```
 ```
 python test_real.py --model_path model_path --test_size 448 --test_file test_file --gray_max gray_max --save_SR save_SR --save_LR save_LR
+# Pre-trained model of DSHSR
+Download [Pre-trained model](https://pan.baidu.com/s/1jp51Q7FUuHq884ZUK1kKLQ). code: 1234
+
 
