@@ -20,9 +20,9 @@ class SyntheticHSI(torch.utils.data.Dataset):
     Jiawen and Sharlet, Dillon and Barron, Jonathan T, CVPR 2019
     """
 
-    def __init__(self, base_dataset, downfactor=4, crop_sz=384, gray_max=255.0, offset_max=16, split='train', random_flip=True, random_scale=True, random_rotate=True):
+    def __init__(self, base_dataset, downfactor=4, crop_sz=384, gray_max=255.0, offset_max=16, split='train', center_crop=False, random_flip=True, random_scale=True, random_rotate=True):
         self.base_dataset = base_dataset
-
+        self.center_crop = center_crop
         self.crop_sz = crop_sz
         self.downsample_factor = downfactor
         self.interpolation_type = 'bilinear'
@@ -58,7 +58,7 @@ class SyntheticHSI(torch.utils.data.Dataset):
             frame = torch.rot90(frame, k=angle // 90, dims=[1, 2])  # dims=[1, 2] 是沿着高度和宽度旋转
 
         # Extract a random crop from the image
-        frame_crop, r1, c1 = random_crop(frame, crop_sz)
+        frame_crop, r1, c1 = random_crop(frame, crop_sz, center_crop=self.center_crop)
         # Generate RAW burst hsi_lr_blur,
         hsi_lr, hsi_lr_blur,flow_vectors, hsi_gt = ohr2lr(frame_crop, self.offset, self.downsample_factor, interpolation_type=self.interpolation_type)
         hsi_gt = hsi_gt[:, self.offset:-self.offset, self.offset:-self.offset]
