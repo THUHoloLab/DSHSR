@@ -96,6 +96,7 @@ class BurstSRDataset(torch.utils.data.Dataset):
 
         ids = [1, 2, 3, 4, 6, 7, 8, 9]
         ids = [5, ] + ids # 5为参考图像
+        #ids=[1, 2, 3, 4, 5, 6, 7, 8, 9]
         return ids
 
     def __len__(self):
