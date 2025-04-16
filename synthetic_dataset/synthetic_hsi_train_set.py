@@ -20,7 +20,7 @@ class SyntheticHSI(torch.utils.data.Dataset):
     Jiawen and Sharlet, Dillon and Barron, Jonathan T, CVPR 2019
     """
 
-    def __init__(self, base_dataset, downfactor=4, crop_sz=384, gray_max=255.0, split='train', random_flip=True, random_scale=True, random_rotate=True):
+    def __init__(self, base_dataset, downfactor=4, crop_sz=384, gray_max=255.0, offset_max=16, split='train', random_flip=True, random_scale=True, random_rotate=True):
         self.base_dataset = base_dataset
 
         self.crop_sz = crop_sz
@@ -31,7 +31,7 @@ class SyntheticHSI(torch.utils.data.Dataset):
         self.random_flip =  random_flip
         self.random_scale = random_scale
         self.random_rotate = random_rotate
-        self.offset = 16
+        self.offset = offset_max
 
     def __len__(self):
         return len(self.base_dataset)
@@ -41,31 +41,16 @@ class SyntheticHSI(torch.utils.data.Dataset):
         frame = self.base_dataset[index]
         frame = torch.from_numpy(frame).float()
         frame = frame.permute(2, 0, 1)
-        '''
-        max_value = torch.max(frame)
-        if max_value > 4096:
-            frame = frame / self.gray_max
-        elif max_value > 256:
-            frame = frame / 4095
-        else:
-            frame = frame / 255
-        '''
         max_value = torch.max(frame)
         frame = frame / max_value
-        #frame = frame.flip([0]).contiguous()
-        #frame = frame / self.gray_max
-        crop_sz = self.crop_sz + 2 * self.offset #self.downsample_factor (复位)
+
+        crop_sz = self.crop_sz + 2 * self.offset
         if self.random_flip:
             if random.random() > 0.5:
-                frame = frame.flip([-1]).contiguous()  # 水平翻转，沿宽度维度
+                frame = frame.flip([-1]).contiguous()
             if random.random() > 0.5:
-                frame = frame.flip([-2]).contiguous()  # 垂直翻转，沿高度维度
+                frame = frame.flip([-2]).contiguous()
 
-        '''if self.random_scale:
-            # 随机选择缩放因子 [1, 0.75, 0.5]
-            scale_factor = random.choice([1, 0.75, 0.5])
-            frame = F.interpolate(frame.unsqueeze(0), scale_factor=scale_factor, mode='bilinear', align_corners=False).squeeze(0)
-        print(frame.shape)'''
 
         if self.random_rotate:
             # 随机选择旋转角度 [0, 90, 180, 270]
